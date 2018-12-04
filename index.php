@@ -4,41 +4,69 @@ require_once 'config.php';
 
 use Yandex\Disk\DiskClient;
 use Angryjack\FileManager;
-//use Angryjack\SqlDumper;
 use Angryjack\HZip;
 
-// Проходимся по каждой папке в корне сервера
-// Если найдена Joomla в папке делаем дамп базы данных
-// Формируем zip архив папки
-// Выгружаем архив на яндекс диск
-// Удаляем архив и переходим к следующей папке
-
 $backupFolderName = BACKUP_PATH . '/' . date('d-m-Y') . '/';
+try{
+    $disk = new DiskClient(OAUTH);
 
-$disk = new DiskClient(OAUTH);
-//todo сделать возможность создание вложенных каталогов
-$dirContent = $disk->createDirectory($backupFolderName);
+    // получаем все папки из указанной папки бекапов на яндекс диске
+    $directories = $disk->directoryContents(dirname($backupFolderName));
+    // проверяем существует ли папка, которую мы пытаемся создать
+    // если не существует - создаем
+    if(! array_search($backupFolderName, array_column($directories, 'href'))) {
+        logger("Создаю директорию: $backupFolderName на яндекс диске.");
+        $dirContent = $disk->createDirectory($backupFolderName);
+    }
 
-$fileManager = new FileManager();
-$folders = $fileManager->getFoldersFromPath(WORK_PATH);
+    $fileManager = new FileManager();
+    $folders = $fileManager->getFoldersFromPath(WORK_PATH);
 
-foreach ($folders as $folder) {
+    //сортируем папки по имени
+    asort($folders);
 
-    $fileName = WORK_PATH . $folder . '.zip';
+    foreach ($folders as $folder) {
+        echo $folder . "\n";
+        if (substr($folder, 0, 1) == '.') {
+            logger("Системная папка: $folder. Пропускаю...");
+            continue;
+        }
+        $fileName = WORK_PATH . '/' . $folder . '.zip';
+        $archiveName = $folder . '.zip';
+        logger("Создаю архив: $archiveName");
+        $start = microtime(true);
+        HZip::zipDir(WORK_PATH . '/' . $folder, $fileName);
+        $time = round(microtime(true) - $start);
+        logger("Архив: $archiveName создан. Операция заняла $time секунд.");
 
-    HZip::zipDir(WORK_PATH . $folder, $fileName);
+        logger("Выгружаю архив: $archiveName на яндекс диск.");
+        $start = microtime(true);
+        $res = $disk->uploadFile(
+            $backupFolderName,
+            array(
+                'path' => $fileName,
+                'size' => filesize($fileName),
+                'name' => $archiveName
+            )
+        );
+        $time = round(microtime(true) - $start);
+        logger("Архив: $archiveName загружен. Операция заняла $time секунд.");
+        //удаление созданного архива
+        logger("Удаление архива $archiveName");
+        $fileManager->deleteFile($fileName);
+    }
 
-    $newName = $folder . '.zip';
+}
+catch (\Exception $e){
+    logger($e->getMessage(), 'error');
+}
 
-    $res = $disk->uploadFile(
-        $backupFolderName,
-        array(
-            'path' => $fileName,
-            'size' => filesize($fileName),
-            'name' => $newName
-        )
-    );
-
-    //удаление созданного архива
-    $fileManager->deleteFile($fileName);
+function logger($message, $type = 'normal'){
+    if($type == 'normal')
+        $logFile = 'runtime.log';
+    else
+        $logFile = 'error.log';
+    $message = '[' . date('d.M.Y H:i:s') . '] ' . $message . "\n";
+    echo $message;
+    file_put_contents($logFile, $message . "\n", FILE_APPEND | LOCK_EX);
 }

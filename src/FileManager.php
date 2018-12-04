@@ -51,7 +51,7 @@ class FileManager
         }
 
         if (! is_dir($path)) {
-            throw new FileManagerException( "Переданный путь $path не является директорией.");
+            throw new FileManagerException( "Данная директория: $path не существует.");
         }
 
         return array_diff(scandir($path), array('..', '.'));
@@ -73,7 +73,7 @@ class FileManager
         }
 
         if (! is_dir($path)) {
-            throw new FileManagerException( "Переданный путь $path не является директорией.");
+            throw new FileManagerException( "Данная директория: $path не существует.");
         }
 
         $folders = array();

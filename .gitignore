@@ -1,4 +1,6 @@
 composer.phar
 config.php
+error.log
+runtime.log
 /vendor/
 /.idea
