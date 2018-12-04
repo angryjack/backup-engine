@@ -15,31 +15,67 @@ use DirectoryIterator;
  */
 class FileManager
 {
-    protected $path;
+    protected $_path;
 
     public function __construct($path = '')
     {
-        $this->path = $path;
+        $this->_path = $path;
+    }
+
+    /**
+     * Устанавливаем рабочий путь
+     * @param $path
+     * @throws FileManagerException
+     */
+    public function setWorkPath($path)
+    {
+        if (empty($path)) {
+            throw new FileManagerException('Вы не указали рабочую директорию.');
+        }
+        $this->_path = $path;
     }
 
     /**
      * Возвращаем все файлы и папки по указанному пути за исключением точек
-     * @param $directory
+     * @param $path
+     * @throws FileManagerException
      * @return array массив с файлами и папками
      */
-    public function scandir($path)
+    public function scandir($path = '')
     {
+        if (empty($path)) {
+            if (empty($this->_path)) {
+                throw new FileManagerException('Вы не указали рабочую директорию.');
+            }
+            $path = $this->_path;
+        }
+
+        if (! is_dir($path)) {
+            throw new FileManagerException( "Переданный путь $path не является директорией.");
+        }
+
         return array_diff(scandir($path), array('..', '.'));
     }
 
     /**
      * Возвращает массив с названием папок по указанному пути
      * @param $path
+     * @throws FileManagerException
      * @return array
      */
-    public function getFoldersFromPath($path)
+    public function getFoldersFromPath($path = '')
     {
-        // '.' for current
+        if (empty($path)) {
+            if (empty($this->_path)) {
+                throw new FileManagerException('Вы не указали рабочую директорию.');
+            }
+            $path = $this->_path;
+        }
+
+        if (! is_dir($path)) {
+            throw new FileManagerException( "Переданный путь $path не является директорией.");
+        }
+
         $folders = array();
         foreach (new DirectoryIterator($path) as $file) {
             if ($file->isDot()) continue;
@@ -56,7 +92,7 @@ class FileManager
      * @param $path
      * @return bool
      */
-    public function checkForJoomla($path)
+    public function checkForJoomla($path = '')
     {
         return file_exists($path . "/public_html/configuration.php");
     }
@@ -67,7 +103,7 @@ class FileManager
      * @throws FileManagerException
      * @return bool
      */
-    public function deleteFile($path)
+    public function deleteFile($path = '')
     {
         if(! file_exists($path)) {
             throw new FileManagerException("Файл $path не найден.");
@@ -76,12 +112,30 @@ class FileManager
         if(! is_writable($path)) {
             throw new FileManagerException("Нет прав на удаление файла: $path");
         }
+        if(! is_file($path)) {
+            throw new FileManagerException("$path должен быть файлом.");
+        }
 
         return unlink($path);
     }
 
-    public function makeDir($path)
+    /*
+     * Создание новой дирректории
+     */
+    public function makeDir($path = '')
     {
+        if (empty($path)) {
+            if (empty($this->_path)) {
+                throw new FileManagerException('Вы не указали рабочую директорию.');
+            }
+            $path = $this->_path;
+        }
+
+        $parent = dirname($path);
+        if (! is_writable($parent)) {
+            throw new FileManagerException("Нет прав на запись: $path");
+        }
+
         return mkdir($path);
     }
 
@@ -91,7 +145,7 @@ class FileManager
      * @throws FileManagerException
      * @return bool
      */
-    public function deleteDir($path){
+    public function deleteDir($path = ''){
         if(! file_exists($path)) {
             throw new FileManagerException("Папка $path не найдена.");
         }
