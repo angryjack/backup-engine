@@ -5,14 +5,7 @@
  */
 
 /**
- * An example of a project-specific implementation.
- *
- * After registering this autoload function with SPL, the following line
- * would cause the function to attempt to load the \Foo\Bar\Baz\Qux class
- * from /path/to/project/src/Baz/Qux.php:
- *
- *      new \Foo\Bar\Baz\Qux;
- *
+ * Project-specific implementation.
  * @param string $class The fully-qualified class name.
  * @return void
  */

@@ -6,6 +6,7 @@
 
 namespace Angryjack;
 
+use Angryjack\Exception\FileManagerException;
 use DirectoryIterator;
 
 /**
@@ -63,19 +64,42 @@ class FileManager
     /**
      * Удаление файла
      * @param $path
+     * @throws FileManagerException
      * @return bool
      */
     public function deleteFile($path)
     {
+        if(! file_exists($path)) {
+            throw new FileManagerException("Файл $path не найден.");
+        }
+
+        if(! is_writable($path)) {
+            throw new FileManagerException("Нет прав на удаление файла: $path");
+        }
+
         return unlink($path);
+    }
+
+    public function makeDir($path)
+    {
+        return mkdir($path);
     }
 
     /**
      * Удаление папки
      * @param $path
+     * @throws FileManagerException
      * @return bool
      */
     public function deleteDir($path){
+        if(! file_exists($path)) {
+            throw new FileManagerException("Папка $path не найдена.");
+        }
+
+        if(! is_writable($path)) {
+            throw new FileManagerException("Нет прав на удаление папки: $path");
+        }
         return rmdir($path);
     }
+
 }
