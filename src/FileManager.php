@@ -58,7 +58,7 @@ class FileManager
     }
 
     /**
-     * Возвращает массив с названием папок по указанному пути
+     * Возвращает отсортированный массив с названием папок по указанному пути
      * @param $path
      * @throws FileManagerException
      * @return array
@@ -84,6 +84,8 @@ class FileManager
                 array_push($folders, $file->getFilename());
             }
         }
+        asort($folders);
+
         return $folders;
     }
 

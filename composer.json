@@ -1,5 +1,6 @@
 {
     "require": {
-        "nixsolutions/yandex-php-library": "^3.0"
+        "nixsolutions/yandex-php-library": "^3.0",
+        "spatie/db-dumper": "^2.11"
     }
 }
