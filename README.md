@@ -15,11 +15,11 @@ $ cp config-example.php config.php
 
 Настраиваем конфиг
 ``` php
-// токен яндекс диска
+// токен яндекс дискаection
 define("OAUTH", "");
 
-// рабочая дирректория с сайтами
-define("WORK_PATH", "/home/web/sites");
+// рабочая дирректория с файлами которые требуется сохранять
+define("WORK_PATH", "/home/user/files");
 
 // папка бекапов на яндекс диске
 define("BACKUP_PATH", "/backups");

@@ -90,14 +90,36 @@ class FileManager
     }
 
     /**
-     * Проверяем папку на установленную систему Joomla
-     * @param $path
-     * @return bool
+     * Возвращает отсортированный массив с названием файлов по указанному пути
+     * @param string $path
+     * @return array
+     * @throws FileManagerException
      */
-    public function checkForJoomla($path = '')
-    {
-        return file_exists($path . "/public_html/configuration.php");
+    public function getFilesFromPath($path = ''){
+        if (empty($path)) {
+            if (empty($this->_path)) {
+                throw new FileManagerException('Вы не указали рабочую директорию.');
+            }
+            $path = $this->_path;
+        }
+
+        if (! is_dir($path)) {
+            throw new FileManagerException( "Данная директория: $path не существует.");
+        }
+
+        $files = array();
+        foreach (new DirectoryIterator($path) as $file) {
+            if ($file->isDot()) continue;
+
+            if ($file->isFile()) {
+                array_push($files, $file->getFilename());
+            }
+        }
+        asort($files);
+
+        return $files;
     }
+
 
     /**
      * Удаление файла

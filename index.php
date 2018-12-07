@@ -1,52 +1,34 @@
 <?php
+/**
+ * User: angryjack
+ * Date: 28.11.18 : 16:02
+ */
 
-require_once 'config.php';
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 
-use Angryjack\FileManager;
-use Angryjack\HZip;
-use Angryjack\YandexDisk;
-use Angryjack\Logger;
+// подключаем автозагрузчик
+require_once __DIR__ . "/src/bootstrap.php";
+
+use Angryjack\Backup;
+
+// токен яндекс диска
+define("OAUTH", "AQAEA7qhSEFNAAVSWAEwf-6QXkzOgy92Y9tAku8");
+
+// рабочая дирректория с файлами, которые требуется бекапить
+define("WORK_PATH", dirname(__DIR__));
+
+// папка бекапов на яндекс диске
+define("BACKUP_PATH", "/backups/suppor9o");
 
 $backupFolderName = BACKUP_PATH . '/' . date('d-m-Y') . '/';
-try{
-    $disk = new YandexDisk(OAUTH);
-    $logger = new Logger();
-    $fileManager = new FileManager();
 
-    $logger->write("Создаю директорию: $backupFolderName на яндекс диске.");
-    $disk->createDirectory($backupFolderName);
+try {
+    $backup = new Backup(WORK_PATH, $backupFolderName, OAUTH);
 
-    $folders = $fileManager->getFoldersFromPath(WORK_PATH);
-
-    foreach ($folders as $folder) {
-        if (substr($folder, 0, 1) == '.') {
-            $logger->write("Системная папка: $folder. Пропускаю...");
-            continue;
-        }
-        $archiveName = $folder . '.zip';
-        $fileName = WORK_PATH . '/ '. $archiveName;
-
-        $logger->start("Создаю архив: $archiveName");
-        HZip::zipDir(WORK_PATH . '/' . $folder, $fileName);
-        $logger->stop("Архив: $archiveName создан.");
-
-        $logger->start("Выгружаю архив: $archiveName на яндекс диск.");
-        $res = $disk->uploadFile(
-            $backupFolderName,
-            array(
-                'path' => $fileName,
-                'size' => filesize($fileName),
-                'name' => $archiveName
-            )
-        );
-        $logger->stop("Архив: $archiveName загружен.");
-        //удаление созданного архива
-        $logger->write("Удаление архива $archiveName");
-        $fileManager->deleteFile($fileName);
-    }
-
+    $backup->files('/^_.*sql.gz\z/');
+    $backup->folders('/^[^\.]/');
 }
 catch (\Exception $e){
     $logger->write($e->getMessage(), true, true);
 }
-
