@@ -1,6 +1,6 @@
 composer.phar
-config.php
 error.log
 runtime.log
+index.php
 /vendor/
 /.idea

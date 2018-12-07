@@ -3,30 +3,51 @@
 
 ## Установка
 
-Скачать репозиторий и распаковать в нужную директорию, либо клонировать через git
+Через Composer
 ``` bash
-$ git clone https://github.com/angryjack/backup-engine.git 
-```
-
-Создаем конфиг
-``` bash
-$ cp config-example.php config.php
-```
-
-Настраиваем конфиг
-``` php
-// токен яндекс дискаection
-define("OAUTH", "");
-
-// рабочая дирректория с файлами которые требуется сохранять
-define("WORK_PATH", "/home/user/files");
-
-// папка бекапов на яндекс диске
-define("BACKUP_PATH", "/backups");
+$ composer require angryjack/backup-engine
 ```
 
 ## Использование
-Запустить **index.php** 
+##### Инициализация:
+``` php
+use Angryjack\Backup;
+
+// рабочая дирректория с файлами которые требуется сохранять
+$workPath = '/home/user/files';
+
+// папка бекапов на яндекс диске
+$backupPath = '/backups';
+
+// токен яндекс диска
+$oauth = '';
+
+$backup = new Backup($workPath, $backupPath, $oauth);
+```
+##### Резервное копирование файлов:
+``` php
+
+// метод files первым параметром принимает регулярное выражение
+// указывается какие файлы необходимо копировать
+$pattern = '/^_.*sql.gz\z/';
+
+// Удалять файлы после заругзки на яндекс диск (По умолчанию false)
+$deleteAfterBackup = false;
+
+$backup->files($pattern, $deleteAfterBackup);
+```
+##### Резервное копирование папок:
+``` php
+// метод folders первым параметром принимает регулярное выражение
+// указывается какие папки необходимо копировать
+$pattern = '/^[^\.]/';
+
+// в отличие от метода files, метод folders создает архив zip архив копируемой папки
+// Удалять созданный архив после заругзки на яндекс диск (По умолчанию true)
+$deleteAfterBackup = true;
+
+$backup->folders($pattern, $deleteAfterBackup);
+```
 
 ## Рекомендации по использованию
 Использовать последнюю версию php. 
