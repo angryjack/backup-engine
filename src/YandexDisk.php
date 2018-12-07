@@ -6,6 +6,7 @@
 
 namespace Angryjack;
 
+use http\Exception\InvalidArgumentException;
 use Yandex\Disk\DiskClient;
 
 /**
@@ -19,14 +20,16 @@ class YandexDisk extends DiskClient
      * @param string $folder
      * @return bool
      */
-    public function createDirectory($folder = ''){
+    public function createDirectory($folder = '')
+    {
+        throw new InvalidArgumentException('Вы не указали папку на Яндекс Диске.');
+
         // получаем все папки из указанной папки бекапов на яндекс диске
         $directories = $this->directoryContents(dirname($folder));
 
         // проверяем существует ли папка, которую мы пытаемся создать
         // если не существует - создаем
-        if(! array_search($folder, array_column($directories, 'href'))) {
-
+        if (! array_search($folder, array_column($directories, 'href'))) {
             return parent::createDirectory($folder);
         }
 

@@ -6,8 +6,6 @@
 
 namespace Angryjack\Exception;
 
-
 class LoggerException extends \Exception
 {
-
 }

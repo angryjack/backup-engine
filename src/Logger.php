@@ -6,7 +6,6 @@
 
 namespace Angryjack;
 
-
 use Angryjack\Exception\LoggerException;
 
 /**
@@ -19,16 +18,21 @@ class Logger
      * Файл
      * @var string
      */
-    protected $_logFile = 'runtime.log';
-    /**
-     * @var string
-     */
-    protected $_errorFile = 'error.log';
-    /**
-     * @var string
-     */
-    protected $_flags;
+    protected $logFile = 'runtime.log';
 
+    /**
+     * @var string
+     */
+    protected $errorFile = 'error.log';
+
+    /**
+     * @var string
+     */
+    protected $flags;
+
+    /**
+     * @var int
+     */
     public $timer;
 
     /**
@@ -36,7 +40,7 @@ class Logger
      */
     public function __construct()
     {
-        $this->_flags = FILE_APPEND | LOCK_EX;
+        $this->flags = FILE_APPEND | LOCK_EX;
     }
 
     /**
@@ -45,7 +49,8 @@ class Logger
      * @param bool $echo
      * @throws LoggerException
      */
-    public function start($message, $echo = true){
+    public function start($message, $echo = true)
+    {
         $this->write($message, $echo);
 
         $this->timer = microtime(true);
@@ -57,7 +62,8 @@ class Logger
      * @param bool $echo
      * @throws LoggerException
      */
-    public function stop($message, $echo = true) {
+    public function stop($message, $echo = true)
+    {
         $length = round(microtime(true) - $this->timer);
         $this->timer = null;
         $message .= " Операция заняла " . $this->timeFormat($length);
@@ -71,9 +77,9 @@ class Logger
     public function setLogFile($name)
     {
         if (empty($name)) {
-           throw new LoggerException('Не указан лог файла.');
+            throw new LoggerException('Не указан лог файла.');
         }
-        $this->_logFile = $name;
+        $this->logFile = $name;
     }
 
     /**
@@ -85,7 +91,7 @@ class Logger
         if (empty($name)) {
             throw new LoggerException('Не указан лог файла.');
         }
-        $this->_errorFile = $name;
+        $this->errorFile = $name;
     }
 
     /**
@@ -102,30 +108,32 @@ class Logger
 
         $message = '['. date('d.M.Y H:i:s') . '] ' . $message . "\n";
 
-        if($echo) echo $message;
+        if ($echo) {
+            echo $message;
+        }
 
-        $logFile = $this->_logFile;
-        if($error) $logFile = $this->_errorFile;
+        $logFile = $this->logFile;
+        if ($error) {
+            $logFile = $this->errorFile;
+        }
 
-        file_put_contents($logFile, $message, $this->_flags);
+        file_put_contents($logFile, $message, $this->flags);
     }
 
     /**
      * @param $seconds
      * @return string
      */
-    protected function timeFormat($seconds){
+    protected function timeFormat($seconds)
+    {
         $message = '';
         if ($seconds < 1) {
             $message =  'менее секунды.';
-        } else if ($seconds >= 1 && $seconds < 60) {
+        } elseif ($seconds >= 1 && $seconds < 60) {
             $message =  $seconds . ' сек';
-        } else if ($seconds > 60) {
-
-            // only in >= php7
-            //$message = floor($seconds / 60) . ' мин ' . ($seconds % 60) ?? $seconds % 60 . ' сек';
-
-            if($seconds % 60 === 0) {
+        } elseif ($seconds > 60) {
+            // only in >= php7 //$message = floor($seconds / 60) . ' мин ' . ($seconds % 60) ?? $seconds % 60 . ' сек';
+            if ($seconds % 60 === 0) {
                 $message = $seconds / 60 . ' мин';
             } else {
                 $message = floor($seconds / 60) . ' мин ' . $seconds % 60 . ' сек';

@@ -17,63 +17,68 @@ class Backup
     /**
      * @var YandexDisk
      */
-    private $_disk;
+    private $disk;
 
     /**
      * @var Logger
      */
-    private $_logger;
+    private $logger;
 
     /**
      * @var FileManager
      */
-    private $_fileManager;
+    private $fileManager;
 
     /**
      * Рабочая директория (из которой сохраняются файлы)
      * @var string
      */
-    private $_workPath = WORK_PATH;
+    private $workPath;
 
     /**
      * Директория куда сохраняются файлы (на Яндекс Диске)
      * @var string
      */
-    private $_backupPath = BACKUP_PATH;
+    private $backupPath;
 
     /**
      * Токен OAUTH для доступа к Яндекс диску
      * @var string
      */
-    private $_oauth = OAUTH;
+    private $oauth;
 
     /**
      * Backup constructor.
      * @param $workPath
      * @param $backupPath
      * @param $oauth
+     * @throws Exception\BackupException
      * @throws Exception\LoggerException
      */
     public function __construct($workPath, $backupPath, $oauth)
     {
-        if (!empty($workPath)) {
-            $this->_workPath = $workPath;
+        if (empty($workPath)) {
+            throw new BackupException('Вы не указали рабочую директорию.');
         }
 
-        if (!empty($backupPath)) {
-            $this->_backupPath = $backupPath;
+        if (empty($backupPath)) {
+            throw new BackupException('Вы не указали директорию на Яндекс Диске');
         }
 
-        if (!empty($oauth)) {
-            $this->_oauth = $oauth;
+        if (empty($oauth)) {
+            throw new BackupException('Вы не указали токен Яндекс Диска');
         }
 
-        $this->_disk = new YandexDisk($this->_oauth);
-        $this->_logger = new Logger();
-        $this->_fileManager = new FileManager();
+        $this->workPath = $workPath;
+        $this->backupPath = $backupPath;
+        $this->oauth = $oauth;
 
-        $this->_logger->write("Создаю директорию: $this->_backupPath на яндекс диске.");
-        $this->_disk->createDirectory($this->_backupPath);
+        $this->disk = new YandexDisk($this->oauth);
+        $this->logger = new Logger();
+        $this->fileManager = new FileManager();
+
+        $this->logger->write("Создаю директорию: $this->backupPath на яндекс диске.");
+        $this->disk->createDirectory($this->backupPath);
     }
 
     /**
@@ -82,34 +87,37 @@ class Backup
      * @param bool $deleteAfterBackup
      * @throws Exception\FileManagerException
      * @throws Exception\LoggerException
+     * @return bool
      */
     public function files($pattern = '', $deleteAfterBackup = false)
     {
-        $files = $this->_fileManager->getFilesFromPath($this->_workPath);
+        $files = $this->fileManager->getFilesFromPath($this->workPath);
 
         if (! empty($pattern)) {
             $files = preg_grep($pattern, $files);
         }
 
         foreach ($files as $file) {
-            $fileName = $this->_workPath . '/' . $file;
+            $fileName = $this->workPath . '/' . $file;
 
-            $this->_logger->start("Выгружаю файл: $file на яндекс диск.");
-            $this->_disk->uploadFile(
-                $this->_backupPath,
+            $this->logger->start("Выгружаю файл: $file на яндекс диск.");
+            $this->disk->uploadFile(
+                $this->backupPath,
                 array(
                     'path' => $fileName,
                     'size' => filesize($fileName),
                     'name' => $file
                 )
             );
-            $this->_logger->stop("Файл: $file загружен.");
+            $this->logger->stop("Файл: $file загружен.");
 
             if ($deleteAfterBackup) {
-                $this->_logger->write("Удаление файла $file");
-                $this->_fileManager->deleteFile($fileName);
+                $this->logger->write("Удаление файла $file");
+                $this->fileManager->deleteFile($fileName);
             }
         }
+
+        return true;
     }
 
     /**
@@ -118,39 +126,41 @@ class Backup
      * @param bool $deleteAfterBackup
      * @throws Exception\FileManagerException
      * @throws Exception\LoggerException
+     * @return bool
      */
     public function folders($pattern = '', $deleteAfterBackup = true)
     {
-        $folders = $this->_fileManager->getFoldersFromPath($this->_workPath);
+        $folders = $this->fileManager->getFoldersFromPath($this->workPath);
 
         if (! empty($pattern)) {
             $folders = preg_grep($pattern, $folders);
         }
 
         foreach ($folders as $folder) {
-
             $archiveName = $folder . '.zip';
-            $fileName = $this->_workPath . '/ ' . $archiveName;
+            $fileName = $this->workPath . '/ ' . $archiveName;
 
-            $this->_logger->start("Создаю архив: $archiveName");
-            HZip::zipDir($this->_workPath . '/' . $folder, $fileName);
-            $this->_logger->stop("Архив: $archiveName создан.");
+            $this->logger->start("Создаю архив: $archiveName");
+            HZip::zipDir($this->workPath . '/' . $folder, $fileName);
+            $this->logger->stop("Архив: $archiveName создан.");
 
-            $this->_logger->start("Выгружаю архив: $archiveName на яндекс диск.");
-            $res = $this->_disk->uploadFile(
-                $this->_backupPath,
+            $this->logger->start("Выгружаю архив: $archiveName на яндекс диск.");
+            $this->disk->uploadFile(
+                $this->backupPath,
                 array(
                     'path' => $fileName,
                     'size' => filesize($fileName),
                     'name' => $archiveName
                 )
             );
-            $this->_logger->stop("Архив: $archiveName загружен.");
+            $this->logger->stop("Архив: $archiveName загружен.");
 
             if ($deleteAfterBackup) {
-                $this->_logger->write("Удаление архива $archiveName");
-                $this->_fileManager->deleteFile($fileName);
+                $this->logger->write("Удаление архива $archiveName");
+                $this->fileManager->deleteFile($fileName);
             }
         }
+
+        return true;
     }
 }
