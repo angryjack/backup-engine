@@ -6,8 +6,6 @@
 
 namespace Angryjack;
 
-use Angryjack\Exception\BackupException;
-
 /**
  * Class Backup
  * @package Angryjack
@@ -55,30 +53,11 @@ class Backup
      * @throws Exception\BackupException
      * @throws Exception\LoggerException
      */
-    public function __construct($workPath, $backupPath, $oauth)
+    public function __construct($workPath = '', $backupPath = '', $oauth = '')
     {
-        if (empty($workPath)) {
-            throw new BackupException('Вы не указали рабочую директорию.');
-        }
-
-        if (empty($backupPath)) {
-            throw new BackupException('Вы не указали директорию на Яндекс Диске');
-        }
-
-        if (empty($oauth)) {
-            throw new BackupException('Вы не указали токен Яндекс Диска');
-        }
-
         $this->workPath = $workPath;
         $this->backupPath = $backupPath;
         $this->oauth = $oauth;
-
-        $this->disk = new YandexDisk($this->oauth);
-        $this->logger = new Logger();
-        $this->fileManager = new FileManager();
-
-        $this->logger->write("Создаю директорию: $this->backupPath на яндекс диске.");
-        $this->disk->createDirectory($this->backupPath);
     }
 
     /**
@@ -91,6 +70,8 @@ class Backup
      */
     public function files($pattern = '', $deleteAfterBackup = false)
     {
+        $this->prepareForBackup();
+
         $files = $this->fileManager->getFilesFromPath($this->workPath);
 
         if (! empty($pattern)) {
@@ -130,6 +111,8 @@ class Backup
      */
     public function folders($pattern = '', $deleteAfterBackup = true)
     {
+        $this->prepareForBackup();
+
         $folders = $this->fileManager->getFoldersFromPath($this->workPath);
 
         if (! empty($pattern)) {
@@ -162,5 +145,58 @@ class Backup
         }
 
         return true;
+    }
+
+    /**
+     * Подготавливаем скрипт резервного копирования (создаем папки, проверяем наличие переменных)
+     * @throws Exception\LoggerException
+     */
+    protected function prepareForBackup()
+    {
+        if (empty($this->oauth)) {
+            throw new \InvalidArgumentException('Не указан OAUTH токен!');
+        }
+
+        if (empty($this->workPath)) {
+            throw new \InvalidArgumentException('Не указана рабочая директория!');
+        }
+
+        if (empty($this->backupPath)) {
+            throw new \InvalidArgumentException('Не указана директория резервного копирования на Яндекс Диске');
+        }
+
+        $this->disk = new YandexDisk($this->oauth);
+        $this->logger = new Logger();
+        $this->fileManager = new FileManager();
+
+        $this->logger->write("Создаю директорию: $this->backupPath на яндекс диске.");
+        $this->disk->createDirectory($this->backupPath);
+    }
+
+    /**
+     * Устанавливаем рабочую директорию
+     * @param $path
+     */
+    public function setWorkPath($path)
+    {
+        $this->workPath = $path;
+    }
+
+    /**
+     * Устанавливаем директорию для резервного копирования на ЯД
+     * @param $path
+     */
+    public function setBackupPath($path)
+    {
+        $this->backupPath = $path;
+    }
+
+    /**
+     * Устанавливаем токен
+     * @param $token
+     */
+    public function setOauth($token)
+    {
+        $this->oauth = $token;
     }
 }
