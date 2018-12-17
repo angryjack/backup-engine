@@ -36,9 +36,6 @@ class FileManager
      */
     public function setWorkPath($path)
     {
-        if (empty($path)) {
-            throw new FileManagerException('Вы не указали рабочую директорию.');
-        }
         $this->path = $path;
     }
 

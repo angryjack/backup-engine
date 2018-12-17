@@ -24,6 +24,16 @@ $oauth = '';
 
 $backup = new Backup($workPath, $backupPath, $oauth);
 ```
+
+##### Изменение директорий:
+``` php
+// устанавливаем рабочую директорию
+$backup->setWorkPath('/home/user/files');
+
+// устанавливаем директорию для резервного копирования
+$backup->setBackupPath('/backups');
+```
+
 ##### Резервное копирование файлов:
 ``` php
 
