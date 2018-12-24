@@ -1,5 +1,25 @@
 {
+    "name": "angryjack/backup-engine",
+    "type": "library",
+    "description": "A PHP library for automatic backups",
+    "keywords": [
+        "angryjack", "backup on yandex disk", "backup-engine", "upload files on yandex disk"
+    ],
+    "homepage": "https://github.com/angryjack/backup-engine",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "angryjack",
+            "email": "angryj2ck@gmail.com",
+            "homepage": "https://github.com/angryjack",
+            "role": "Developer"
+        }
+    ],
     "require": {
+        "php" : ">=5.6",
         "nixsolutions/yandex-php-library": "^3.0"
+    },
+    "config": {
+        "sort-packages": true
     }
 }

@@ -32,7 +32,6 @@ class FileManager
     /**
      * Устанавливаем рабочий путь
      * @param $path
-     * @throws FileManagerException
      */
     public function setWorkPath($path)
     {
