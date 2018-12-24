@@ -2,6 +2,7 @@
     "name": "angryjack/backup-engine",
     "type": "library",
     "description": "A PHP library for automatic backups",
+    "version": "1.0",
     "keywords": [
         "angryjack", "backup on yandex disk", "backup-engine", "upload files on yandex disk"
     ],
@@ -23,11 +24,6 @@
     "autoload": {
         "psr-4": {
             "Angryjack\\backup-engine\\": "src/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "master": "1.0"
         }
     },
     "config": {
