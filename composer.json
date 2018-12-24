@@ -2,7 +2,7 @@
     "name": "angryjack/backup-engine",
     "type": "library",
     "description": "A PHP library for automatic backups",
-    "version": "1.0",
+    "version": "stable",
     "keywords": [
         "angryjack", "backup on yandex disk", "backup-engine", "upload files on yandex disk"
     ],
