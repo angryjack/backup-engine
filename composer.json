@@ -6,6 +6,7 @@
         "angryjack", "backup on yandex disk", "backup-engine", "upload files on yandex disk"
     ],
     "homepage": "https://github.com/angryjack/backup-engine",
+    "minimum-stability": "dev",
     "license": "MIT",
     "authors": [
         {
