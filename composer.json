@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Angryjack\\backup-engine\\": "src/"
+            "Angryjack\\BackupEngine\\": "src/"
         }
     },
     "config": {
