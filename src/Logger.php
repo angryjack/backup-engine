@@ -4,9 +4,9 @@
  * Date: 05.12.18 : 10:45
  */
 
-namespace Angryjack;
+namespace Angryjack\BackupEngine;
 
-use Angryjack\Exception\LoggerException;
+use Angryjack\BackupEngine\Exception\LoggerException;
 
 /**
  * Class Logger

@@ -4,9 +4,9 @@
  * Date: 28.11.18 : 17:15
  */
 
-namespace Angryjack;
+namespace Angryjack\BackupEngine;
 
-use Angryjack\Exception\FileManagerException;
+use Angryjack\BackupEngine\Exception\FileManagerException;
 use DirectoryIterator;
 
 /**
@@ -152,8 +152,11 @@ class FileManager
         return unlink($path);
     }
 
-    /*
+    /**
      * Создание новой дирректории
+     * @param string $path
+     * @return bool
+     * @throws FileManagerException
      */
     public function makeDir($path = '')
     {

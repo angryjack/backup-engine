@@ -4,7 +4,7 @@
  * Date: 06.12.18 : 16:40
  */
 
-namespace Angryjack;
+namespace Angryjack\BackupEngine;
 
 /**
  * Class Backup
@@ -50,8 +50,6 @@ class Backup
      * @param $workPath
      * @param $backupPath
      * @param $oauth
-     * @throws Exception\BackupException
-     * @throws Exception\LoggerException
      */
     public function __construct($workPath = '', $backupPath = '', $oauth = '')
     {

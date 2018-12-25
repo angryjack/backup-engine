@@ -4,7 +4,7 @@
  * Date: 05.12.18 : 15:43
  */
 
-namespace Angryjack;
+namespace Angryjack\BackupEngine;
 
 use InvalidArgumentException;
 use Yandex\Disk\DiskClient;

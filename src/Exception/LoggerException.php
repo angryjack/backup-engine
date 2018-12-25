@@ -4,7 +4,7 @@
  * Date: 05.12.18 : 14:09
  */
 
-namespace Angryjack\Exception;
+namespace Angryjack\BackupEngine\Exception;
 
 class LoggerException extends \Exception
 {

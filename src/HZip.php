@@ -4,7 +4,7 @@
  * Date: 29.11.18 : 14:34
  */
 
-namespace Angryjack;
+namespace Angryjack\BackupEngine;
 
 use ZipArchive;
 
