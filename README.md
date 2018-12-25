@@ -11,7 +11,10 @@ $ composer require angryjack/backup-engine
 ## Использование
 ##### Инициализация:
 ``` php
-use Angryjack\Backup;
+use Angryjack\BackupEngine\Backup;
+
+// подключаем автозагрузчик
+require __DIR__ . '/vendor/autoload.php';
 
 // рабочая дирректория с файлами которые требуется сохранять
 $workPath = '/home/user/files';
@@ -27,10 +30,10 @@ $backup = new Backup($workPath, $backupPath, $oauth);
 
 ##### Изменение директорий:
 ``` php
-// устанавливаем рабочую директорию
+// устанавливаем(изменяем) рабочую директорию
 $backup->setWorkPath('/home/user/files');
 
-// устанавливаем директорию для резервного копирования
+// устанавливаем(изменяем) директорию для резервного копирования
 $backup->setBackupPath('/backups');
 ```
 
