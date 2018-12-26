@@ -53,8 +53,8 @@ class Backup
      */
     public function __construct($workPath = '', $backupPath = '', $oauth = '')
     {
-        $this->workPath = $workPath;
-        $this->backupPath = $backupPath;
+        $this->setWorkPath($workPath);
+        $this->setBackupPath($backupPath);
         $this->oauth = $oauth;
     }
 
@@ -119,7 +119,7 @@ class Backup
 
         foreach ($folders as $folder) {
             $archiveName = $folder . '.zip';
-            $fileName = $this->workPath . '/ ' . $archiveName;
+            $fileName = $this->workPath . '/' . $archiveName;
 
             $this->logger->start("Создаю архив: $archiveName");
             HZip::zipDir($this->workPath . '/' . $folder, $fileName);
@@ -186,6 +186,9 @@ class Backup
      */
     public function setBackupPath($path)
     {
+        if (substr($path, -1) != '/') {
+            $path .= '/';
+        }
         $this->backupPath = $path;
     }
 
