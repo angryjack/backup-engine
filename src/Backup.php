@@ -186,7 +186,7 @@ class Backup
      */
     public function setBackupPath($path)
     {
-        if (substr($path, -1) != '/') {
+        if (! empty($path) && substr($path, -1) != '/') {
             $path .= '/';
         }
         $this->backupPath = $path;

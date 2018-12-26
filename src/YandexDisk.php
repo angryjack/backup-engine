@@ -17,24 +17,26 @@ class YandexDisk extends DiskClient
 {
     /**
      * Создаем папку на яндекс диске, если папка существует - возвращаем false
-     * @param string $folder
+     * @param string $path
      * @return bool
      */
-    public function createDirectory($folder = '')
+    public function createDirectory($path = '')
     {
-        if (empty($folder)) {
+        if (empty($path)) {
             throw new InvalidArgumentException('Вы не указали папку на Яндекс Диске.');
         }
+        $folders = explode('/', $path);
 
-        // получаем все папки из указанной папки бекапов на яндекс диске
-        $directories = $this->directoryContents(dirname($folder));
+        $currentDir = '/';
+        for ($i = 1; $i < count($folders) - 1; $i++) {
+            $currentDir .= $folders[$i] . '/';
+            $directories = $this->directoryContents(dirname($currentDir));
 
-        // проверяем существует ли папка, которую мы пытаемся создать
-        // если не существует - создаем
-        if (! array_search($folder, array_column($directories, 'href'))) {
-            return parent::createDirectory($folder);
+            if (! array_search($currentDir, array_column($directories, 'href'))) {
+                parent::createDirectory($currentDir);
+            }
         }
 
-        return false;
+        return true;
     }
 }
